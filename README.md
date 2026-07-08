@@ -1,4 +1,4 @@
 # PokedexCLI
 # PokedexCLI
-![alt text](pokeGopher.png)
+![alt text](transparentPokeGopher.png)
 ..
