@@ -41,6 +41,11 @@ func main() {
 			description: "Lists all the Pokemon in a location area",
 			callbackF:   exploreArea,
 		},
+		"catch": {
+			name:        "catch",
+			description: "Attempts to catch a pokemon",
+			callbackF:   catch,
+		},
 	}
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
