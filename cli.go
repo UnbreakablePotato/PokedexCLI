@@ -196,40 +196,59 @@ func getPrevMap(c *config) error {
 	return nil
 }
 
+var exploreCache = pokecache.NewCache(duration)
+
+var expObj = exploreObj{}
+
 func exploreArea(c *config, name string) error {
 	fmt.Println("debug: 1")
 
 	fullUrl := "https://pokeapi.co/api/v2/location-area" + "/" + name
 
-	res, err := http.Get(fullUrl)
-	if err != nil {
-		fmt.Printf("Request failed: %v\n", err)
+	url, condition := exploreCache.Get(fullUrl)
+
+	if !condition {
+		res, err := http.Get(fullUrl)
+		if err != nil {
+			fmt.Printf("Request failed: %v\n", err)
+			return err
+		}
+		fmt.Printf("debug: %s\n", fullUrl)
+
+		defer res.Body.Close()
+
+		if res.StatusCode != http.StatusOK {
+			fmt.Println("Area does not exist")
+			err := fmt.Sprintf("Status code: %v\n", res.StatusCode)
+			return errors.New(err)
+		}
+		fmt.Println("debug: 3")
+
+		data, err := io.ReadAll(res.Body)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+			return err
+		}
+		fmt.Println("debug: 4")
+
+		if err := json.Unmarshal(data, &expObj); err != nil {
+			fmt.Printf("Error: %v\n", err)
+			return err
+		}
+		fmt.Println("debug: 5")
+
+		for i := range expObj.PokemonEncounters {
+			fmt.Printf("%v\n", expObj.PokemonEncounters[i].Pokemon.Name)
+		}
+
+		exploreCache.Add(fullUrl, data)
+
+		return nil
+	}
+	fmt.Println("Key found")
+	if err := json.Unmarshal(url, &expObj); err != nil {
 		return err
 	}
-	fmt.Printf("debug: %s\n", fullUrl)
-
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		err := fmt.Sprintf("Status code: %v\n", res.StatusCode)
-		return errors.New(err)
-	}
-	fmt.Println("debug: 3")
-
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		return err
-	}
-	fmt.Println("debug: 4")
-
-	expObj := exploreObj{}
-
-	if err := json.Unmarshal(data, &expObj); err != nil {
-		fmt.Printf("Error: %v\n", err)
-		return err
-	}
-	fmt.Println("debug: 5")
 
 	for i := range expObj.PokemonEncounters {
 		fmt.Printf("%v\n", expObj.PokemonEncounters[i].Pokemon.Name)
