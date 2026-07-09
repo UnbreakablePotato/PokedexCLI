@@ -11,12 +11,14 @@ import (
 	"github.com/UnbreakablePotato/pokedexcli/internal/pokecache"
 )
 
+// 60 seconds in nano seconds
 const duration = 60000000000
 
 type cliCommand struct {
 	name        string
 	description string
 	callback    func(c *config) error
+	callbackF   func(c *config, name string) error
 }
 
 type result struct {
@@ -30,6 +32,62 @@ type config struct {
 	Next    string   `json:"next"`
 	Prev    string   `json:"previous"`
 	Results []result `json:"results"`
+}
+
+type exploreObj struct {
+	EncounterMethodRates []struct {
+		EncounterMethod struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"encounter_method"`
+		VersionDetails []struct {
+			Rate    int `json:"rate"`
+			Version struct {
+				Name string `json:"name"`
+				URL  string `json:"url"`
+			} `json:"version"`
+		} `json:"version_details"`
+	} `json:"encounter_method_rates"`
+	GameIndex int `json:"game_index"`
+	ID        int `json:"id"`
+	Location  struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"location"`
+	Name  string `json:"name"`
+	Names []struct {
+		Language struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"language"`
+		Name string `json:"name"`
+	} `json:"names"`
+	PokemonEncounters []struct {
+		Pokemon struct {
+			Name string `json:"name"`
+			URL  string `json:"url"`
+		} `json:"pokemon"`
+		VersionDetails []struct {
+			EncounterDetails []struct {
+				Chance          int `json:"chance"`
+				ConditionValues []struct {
+					Name string `json:"name"`
+					URL  string `json:"url"`
+				} `json:"condition_values"`
+				MaxLevel int `json:"max_level"`
+				Method   struct {
+					Name string `json:"name"`
+					URL  string `json:"url"`
+				} `json:"method"`
+				MinLevel int `json:"min_level"`
+			} `json:"encounter_details"`
+			MaxChance int `json:"max_chance"`
+			Version   struct {
+				Name string `json:"name"`
+				URL  string `json:"url"`
+			} `json:"version"`
+		} `json:"version_details"`
+	} `json:"pokemon_encounters"`
 }
 
 func commandExit(c *config) error {
@@ -134,6 +192,48 @@ func getPrevMap(c *config) error {
 	con.URL = con.Prev
 
 	getMap(&con)
+
+	return nil
+}
+
+func exploreArea(c *config, name string) error {
+	fmt.Println("debug: 1")
+
+	fullUrl := "https://pokeapi.co/api/v2/location-area" + "/" + name
+
+	res, err := http.Get(fullUrl)
+	if err != nil {
+		fmt.Printf("Request failed: %v\n", err)
+		return err
+	}
+	fmt.Printf("debug: %s\n", fullUrl)
+
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		err := fmt.Sprintf("Status code: %v\n", res.StatusCode)
+		return errors.New(err)
+	}
+	fmt.Println("debug: 3")
+
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return err
+	}
+	fmt.Println("debug: 4")
+
+	expObj := exploreObj{}
+
+	if err := json.Unmarshal(data, &expObj); err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return err
+	}
+	fmt.Println("debug: 5")
+
+	for i := range expObj.PokemonEncounters {
+		fmt.Printf("%v\n", expObj.PokemonEncounters[i].Pokemon.Name)
+	}
 
 	return nil
 }
