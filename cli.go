@@ -222,20 +222,17 @@ func exploreArea(c *config, name string) error {
 			err := fmt.Sprintf("Status code: %v\n", res.StatusCode)
 			return errors.New(err)
 		}
-		fmt.Println("debug: 3")
 
 		data, err := io.ReadAll(res.Body)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			return err
 		}
-		fmt.Println("debug: 4")
 
 		if err := json.Unmarshal(data, &expObj); err != nil {
 			fmt.Printf("Error: %v\n", err)
 			return err
 		}
-		fmt.Println("debug: 5")
 
 		for i := range expObj.PokemonEncounters {
 			fmt.Printf("%v\n", expObj.PokemonEncounters[i].Pokemon.Name)
