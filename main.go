@@ -36,6 +36,11 @@ func main() {
 			description: "Lists the previous 20 location areas in the Pokemon world",
 			callback:    getPrevMap,
 		},
+		"explore": {
+			name:        "explore",
+			description: "Lists all the Pokemon in a location area",
+			callbackF:   exploreArea,
+		},
 	}
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
@@ -52,17 +57,28 @@ func main() {
 		}
 
 		text := scanner.Text()
-		res := cleanInput(text)
+		res := []string{}
+		res = append(res, cleanInput(text)...)
 
-		value, ok := commandMap[res[0]]
+		if len(res) < 2 {
+			value, ok := commandMap[res[0]]
 
-		if ok {
-			if res[0] == value.name {
-				commandMap[value.name].callback(&emptyStruct)
+			if ok {
+				if res[0] == value.name {
+					commandMap[value.name].callback(&emptyStruct)
 
+				}
+			} else {
+				fmt.Println("Unknown command")
 			}
-		} else {
-			fmt.Println("Unknown command")
+		} else if len(res) == 2 {
+			command, ok := commandMap[res[0]]
+			fmt.Println("debug: Entered command with 2 inputs")
+			if !ok {
+				fmt.Println("Unknown command")
+			}
+			commandMap[command.name].callbackF(&emptyStruct, res[1])
+			fmt.Println("debug: callbackF called")
 		}
 
 	}
