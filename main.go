@@ -46,6 +46,16 @@ func main() {
 			description: "Attempts to catch a pokemon",
 			callbackF:   catch,
 		},
+		"inspect": {
+			name:        "inspect",
+			description: "Shows",
+			callbackF:   inspect,
+		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "Lists all caught pokemons",
+			callback:    printPokedex,
+		},
 	}
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
