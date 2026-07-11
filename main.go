@@ -10,6 +10,8 @@ var commandMap map[string]cliCommand
 
 func main() {
 
+	loadParty("party")
+
 	emptyStruct := config{
 		Next: "",
 		Prev: "",
@@ -48,7 +50,7 @@ func main() {
 		},
 		"inspect": {
 			name:        "inspect",
-			description: "Shows",
+			description: "Shows the base stats of a pokemon in your pokedex",
 			callbackF:   inspect,
 		},
 		"pokedex": {
@@ -60,6 +62,11 @@ func main() {
 			name:        "delete",
 			description: "Deletes a specific pokemon from your party",
 			callbackF:   commandDelete,
+		},
+		"show": {
+			name:        "show",
+			description: "Lists every pokemon in your active roster",
+			callback:    commandShowParty,
 		},
 	}
 	scanner := bufio.NewScanner(os.Stdin)
