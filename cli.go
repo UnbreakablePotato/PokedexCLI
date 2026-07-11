@@ -91,6 +91,7 @@ type exploreObj struct {
 }
 
 func commandExit(c *config) error {
+	writeParty(pokemonParty)
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
