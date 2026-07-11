@@ -56,6 +56,11 @@ func main() {
 			description: "Lists all caught pokemons",
 			callback:    printPokedex,
 		},
+		"delete": {
+			name:        "delete",
+			description: "Deletes a specific pokemon from your party",
+			callbackF:   commandDelete,
+		},
 	}
 	scanner := bufio.NewScanner(os.Stdin)
 	for {

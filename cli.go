@@ -253,3 +253,8 @@ func exploreArea(c *config, name string) error {
 
 	return nil
 }
+
+func commandDelete(c *config, pokemon string) error {
+	removePokemon(pokemon, pokemonParty)
+	return nil
+}

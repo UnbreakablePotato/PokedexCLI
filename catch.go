@@ -340,6 +340,7 @@ func catch(c *config, pokemonName string) error {
 
 	pokedex[p.Name] = p
 	fmt.Printf("%s was caught!\n", p.Name)
+	addPokemon(p, pokemonParty)
 	return nil
 }
 
