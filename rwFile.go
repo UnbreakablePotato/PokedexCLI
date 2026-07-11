@@ -7,6 +7,7 @@ import (
 )
 
 func writeParty(party map[string]pokemon) error {
+	//path := filepath.Join(os.TempDir(), "party")
 	file, err := os.Create("party")
 	if err != nil {
 		fmt.Printf("Error: %v", err)
@@ -27,7 +28,19 @@ func writeParty(party map[string]pokemon) error {
 	return nil
 }
 
-func readParty(filename string) error {
+func loadParty(filename string) error {
+	//path := filepath.Join(os.TempDir(), filename)
+
+	fileData, err := os.ReadFile(filename)
+	if err != nil {
+		fmt.Printf("Could not open file: %v\n", err)
+		return err
+	}
+
+	if err := json.Unmarshal(fileData, &pokemonParty); err != nil {
+		fmt.Printf("Failed to unmarshal file into pokemon party map: %v", err)
+		return err
+	}
 
 	return nil
 }
